@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PR-Nummern Decoder · VAG Toolbox</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#020812;--panel:rgba(4,18,32,.92);--line:rgba(36,111,160,.78);--text:#f4f8fc;--muted:#9fb5c7;--blue:#0aa5ff;--blue2:#0878ed}
+html{background:var(--bg)}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:linear-gradient(rgba(1,7,14,.62),rgba(1,7,14,.84)),url('vag-toolbox-login.jpg?v=50') center top/cover fixed no-repeat,var(--bg)}
+.wrap{max-width:980px;margin:auto;padding:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 18px 45px rgba(0,0,0,.3);backdrop-filter:blur(6px)}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{width:52px;height:52px;border-radius:14px;border:1px solid rgba(33,170,255,.75);background:linear-gradient(135deg,#073a67,#0aa5ff);display:grid;place-items:center;font-weight:900}
+.title{flex:1;min-width:230px} h1{margin:0 0 4px;font-size:28px} h2{font-size:17px;color:#42b8ff;margin:0 0 14px}
+.sub,.muted{color:var(--muted);font-size:13px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{border:1px solid rgba(60,116,154,.72);border-radius:9px;padding:11px 15px;font-weight:700;cursor:pointer;background:rgba(8,28,45,.96);color:#dfefff}
+.primary{background:linear-gradient(90deg,var(--blue2),var(--blue));border-color:#16a8ff;color:#fff}
+.search{display:grid;grid-template-columns:1fr auto;gap:10px}
+input{width:100%;padding:15px;border:1px solid #52718a;border-radius:10px;background:#edf4ff;color:#101820;font-size:18px;text-transform:uppercase;outline:none}
+input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(10,165,255,.18)}
+.result{margin-top:14px;display:none}
+.hit{background:rgba(6,25,43,.82);border:1px solid rgba(47,99,135,.6);border-radius:12px;padding:16px;margin-top:10px}
+.code{font:800 22px Consolas,monospace;color:#66c5ff;margin-bottom:5px}
+.desc{font-size:16px;line-height:1.45}
+.notfound{color:#ffb3b3}
+.footer{text-align:center;color:#7790a2;font-size:11px;padding:6px 0 18px}
+#app{display:none}.ready #app{display:block}
+@media(max-width:600px){.wrap{padding:10px}.card{padding:15px;border-radius:14px}.search{grid-template-columns:1fr}.actions{width:100%}.actions button{flex:1}h1{font-size:23px}}
+</style>
+<script>
+const U='https://mjvqdhclkqgrvqfaafzp.supabase.co';
+const K='sb_publishable_H4rBbPLak0JM-9pU2ympmw_sK9Wc1En';
+(async()=>{
+ const t=localStorage.getItem('mk100_token')||sessionStorage.getItem('mk100_token');
+ if(!t){location.replace('index.html');return}
+ try{
+   const u=await fetch(U+'/auth/v1/user',{headers:{apikey:K,Authorization:'Bearer '+t}});
+   if(!u.ok)throw 0;
+   const user=await u.json();
+   const r=await fetch(U+'/rest/v1/mk100_members?select=status,is_active&user_id=eq.'+encodeURIComponent(user.id),{headers:{apikey:K,Authorization:'Bearer '+t}});
+   if(!r.ok)throw 0;
+   const a=await r.json();
+   if(!a[0]||a[0].status!=='approved'||a[0].is_active!==true)throw 0;
+   document.documentElement.classList.add('ready');
+ }catch(e){
+   localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');
+   location.replace('index.html?access=denied');
+ }
+})();
+</script>
+</head>
+<body>
+<div id="app"><div class="wrap">
+<div class="card"><div class="top">
+<div class="logo">PR</div>
+<div class="title"><h1>PR-Nummern Decoder</h1><div class="sub">VAG Toolbox by Lukas Kopper · PR-Code eingeben und Bedeutung anzeigen</div></div>
+<div class="actions"><button onclick="location.href='toolbox.html'">← TOOLBOX</button><button onclick="logout()">ABMELDEN</button></div>
+</div></div>
+
+<div class="card">
+<h2>PR-Code suchen</h2>
+<div class="search">
+<input id="q" maxlength="80" placeholder="z. B. 1AT oder 7K1 8T6" onkeydown="if(event.key==='Enter')decodePR()">
+<button class="primary" onclick="decodePR()">SUCHEN</button>
+</div>
+<div class="muted" style="margin-top:10px">Ein oder mehrere 3-stellige PR-Codes eingeben. Trennung per Leerzeichen, Komma oder Zeilenumbruch.</div>
+<div id="result" class="result"></div>
+</div>
+
+<div class="footer">Entwicklung und Programmierung von Lukas Kopper / l.kopper16@gmail.com</div>
+</div></div>
+
+<script>
+const PR={"1AT": "Elektronisches Stabilisierungsprogramm (ESP)", "1N0": "Standard-Lenkung", "1N1": "Servolenkung", "1N2": "Servolenkung elektro / hydraulisch", "1N3": "Servolenkung, geschwindigkeitsabhängig (Servotronic)", "1N4": "Servolenkung", "1N5": "Servolenkung mit Mobilitätshilfe", "1N6": "Servolenkung", "1N7": "Dynamiklenkung", "1N8": "Servolenkung (Dynamiklenkung)", "1N9": "Servolenkung (Lenkungshubeinschränkung)", "1SA": "Ohne zusätzlichen Triebwerks-Unterschutz", "1SB": "Zusätzlicher Triebwerks-Unterschutz", "1SC": "Zusätzlicher Triebwerks-Unterschutz für Motor", "1SD": "Zusätzlicher Triebwerks-Unterschutz", "1SE": "Zusätzlicher Triebwerks-Unterschutz (karosserieabhängig)", "1SF": "Zusätzlicher Triebwerks-Unterschutz", "1SG": "Antimagnetische Bodenpanzerung", "1SH": "Zusätzlicher Triebwerks-Unterschutz", "1SJ": "Zusätzlicher Triebwerks-Unterschutz", "1SK": "Zusätzlicher Triebwerks-Unterschutz plus Steinschlagschutz-Unterboden", "1SL": "Steinschlagschutz-Unterboden", "1F0": "Ohne Abschleppösen vorn und hinten", "1F1": "1 Abschleppöse vorn und 1 hinten", "1F2": "2 Abschleppösen vorn und 1 hinten", "1F3": "Eine Abschleppöse vorn", "1F4": "Eine Abschleppöse vorn und hinten (hinten abschraubbar)", "1F5": "1 Abschleppöse hinten, ohne vorn", "0G0": "Gangschaltung, Seilzug", "0G1": "Gangschaltungshebel", "0G2": "Wählhebel für Automatikschaltung", "0G3": "Gangschaltung, Gestänge", "0G4": "Gangschaltung, Seilzug", "0G5": "Gangschaltungshebel", "0G6": "Tiptronic mit Rollmodus", "0G7": "Tiptronic", "0G8": "Automatische Handschaltung", "0G9": "Gangschaltungshebel", "G0A": "4-Gang-Schaltgetriebe", "G0B": "5-Gang-Schaltgetriebe (Langübersetzung für China)", "G0C": "5-Gang-Schaltgetriebe", "G0D": "3-Gang-Automatikgetriebe", "G0E": "4-Gang-Automatikgetriebe", "G0F": "5-Gang-Automatikgetriebe", "G0G": "5-Gang-Schaltgetriebe für Allrad", "G0H": "4-Gang-Automatikgetriebe für Allrad", "G0J": "5-Gang-Schaltgetriebe (andere Spreizung)", "G0K": "6-Gang-Schaltgetriebe", "G0L": "6-Gang-Schaltgetriebe für Allrad", "G0M": "6-Gang-Schaltgetriebe (Höchstgeschwindigkeit im 5. Gang)", "G0N": "5-Gang-Schaltgetriebe für Allrad (3-Wellen-Getriebe)", "G0P": "Automatisiertes Schaltgetriebe (ASG / DS), 5-Gang", "G0Q": "5-Gang-Automatikgetriebe für Allrad", "G0R": "6-Gang-Automatikgetriebe für Allrad", "0F0": "Kraftstoffsystem Otto-Einspritzer Erdgas", "0F1": "Kraftstoffsystem Otto-Einspritzer, Ethanolkraftstoff", "0F2": "Kraftstoffsystem Otto-Einspritzer", "0F3": "Kraftstoffsystem Diesel", "0F4": "Kraftstoffsystem Otto-Turbo", "0F5": "Kraftstoffsystem Diesel", "0F6": "Kraftstoffsystem Turbodiesel mit Direkteinspritzung (TDI)", "0F7": "Kraftstoffsystem Saugdiesel mit Direkteinspritzung (SDI)", "0F8": "Kraftstoffsystem Diesel, gekühlt", "0F9": "Kraftstoffsystem Diesel, gekühlt", "1A0": "Kraftstoffsystem (Gas-Umrüstung möglich)", "1A1": "Otto-Einspritzer mit rücklauffreiem Einspritzsystem", "1A2": "Otto-Direkteinspritzung (FSI)", "1A3": "Otto-Einspritzer mit rücklauffreiem Einspritzsystem und geändertem Einspritzdruck", "1A4": "Kraftstoffsystem Multi Fuel", "1A5": "Otto-Einspritzer (FSI)", "7K0": "Ohne Reifendruckkontrolle", "7K1": "Reifendruckkontrolle", "7K2": "Reifendruckkontrolle, direkt messend", "7K3": "Reifendruckkontrolle, Frequenz 433 MHz High", "7K4": "Reifendruckkontrolle, Frequenz 315 MHz High", "7K5": "Reifendruckkontrolle, Frequenz 315 MHz mit reduzierter Sendeleistung", "7K6": "Reifenkontrollanzeige", "7K7": "Reifendruckkontrolle, Frequenz 433 MHz Basis", "7K8": "Reifendruckkontrolle, Frequenz 315 MHz Basis", "7K9": "Reifenkontrollanzeige", "8T0": "Ohne Geschwindigkeitsregelanlage (GRA)", "8T1": "Geschwindigkeitsregelanlage (GRA)", "8T2": "Geschwindigkeitsregelanlage (GRA) elektronisch", "8T3": "Automatische Distanzregelung plus Geschwindigkeitsregelanlage", "8T4": "Automatische Distanzregelung", "8T5": "Distanzregelung plus Geschwindigkeitsregelanlage", "8T6": "Geschwindigkeitsregelanlage plus Speed-Limiter", "8T7": "Distanzregelung plus Geschwindigkeitsregelanlage und Speed-Limiter (ohne follow to stop)", "8T8": "Distanzregelung plus Geschwindigkeitsregelanlage und Speed-Limiter (mit follow to stop)", "7W0": "Ohne erweitertes Sicherheitssystem", "7W1": "Mit erweitertem Sicherheitssystem (Pre Crash Basic)", "7W2": "Mit erweitertem Sicherheitssystem (Pre Crash Basic und Front)", "7W3": "Mit erweitertem Sicherheitssystem (Pre Crash Basic und Heck)", "7W4": "Mit erweitertem Sicherheitssystem (Pre Crash Basic, Front und Heck)", "7B0": "Ohne Steckdose", "7B1": "220-Volt-Steckdose", "7B2": "12-Volt-Steckdose im Kofferraum", "7B3": "12-Volt-Steckdose(n)", "7B4": "4 12-Volt-Steckdosen im Fahrgastraum", "7B5": "12-Volt-Steckdose(n)", "7B6": "12-Volt-Steckdose(n)", "7B7": "12-Volt-Steckdose(n)", "7B8": "12-Volt-Steckdose(n)", "QR0": "Ohne Kompass / Verkehrszeichenanzeige / Verkehrszeichenerkennung", "QR1": "Mit Kompass", "QR2": "Mit Verkehrszeichenanzeige", "QR3": "Mit Kompass", "QR4": "Mit Anzeige", "QR5": "Mit Anzeige", "QR8": "Ohne Verkehrszeichenerkennung", "QR9": "Mit Verkehrszeichenerkennung", "QW1": "Zentrale Bedieneinheit, vorn", "QW2": "Zentrale Bedieneinheit, vorn und hinten – Viersitzer –", "QW3": "Zentrale Bedieneinheit, vorn und hinten – Fünfsitzer –", "QW4": "Zentrale Bedieneinheit, mit Funkfernbedienung", "QW5": "Zentrale Bedieneinheit", "X0A": "Landesverkaufsprogramm Deutschland", "X0B": "Landesverkaufsprogramm Deutschland, Direktabnehmer", "X0C": "Landesverkaufsprogramm USA Touristen", "X0D": "Landesverkaufsprogramm Deutschland, Rechtslenker", "X0E": "Landesverkaufsprogramm Kanada Touristen", "X10": "Landesverkaufsprogramm Europa Mitte", "X11": "Landesverkaufsprogramm Europa Nord", "X12": "Landesverkaufsprogramm Europa Süd", "X13": "Landesverkaufsprogramm Europa Rechtslenker", "EA1": "Anschlussgarantie 1 Jahr, max. 30.000 km", "EA2": "Anschlussgarantie 1 Jahr, max. 60.000 km", "EA3": "Anschlussgarantie 1 Jahr, max. 90.000 km", "EA4": "Anschlussgarantie 2 Jahre, max. 40.000 km", "EA5": "Anschlussgarantie 2 Jahre, max. 80.000 km", "EA6": "Anschlussgarantie 2 Jahre, max. 120.000 km", "EA7": "Anschlussgarantie 3 Jahre, max. 50.000 km", "EA8": "Anschlussgarantie 3 Jahre, max. 100.000 km", "EA9": "Anschlussgarantie 3 Jahre, max. 150.000 km", "EB0": "Anschlussgarantie 1 Jahr, ohne Laufleistungsbeschränkung", "EB1": "Anschlussgarantie 2 Jahre, ohne Laufleistungsbeschränkung", "EB2": "Anschlussgarantie 3 Jahre, ohne Laufleistungsbeschränkung"};
+function logout(){localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');location.href='index.html'}
+function esc(s){return String(s||'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}
+function decodePR(){
+  const raw=document.getElementById('q').value.toUpperCase();
+  const codes=[...new Set((raw.match(/[A-Z0-9]{3}/g)||[]))];
+  const box=document.getElementById('result');
+  box.style.display='block';
+  if(!codes.length){
+    box.innerHTML='<div class="hit notfound">Bitte mindestens einen 3-stelligen PR-Code eingeben.</div>';
+    return;
+  }
+  box.innerHTML=codes.map(c=>PR[c]
+    ? `<div class="hit"><div class="code">${c}</div><div class="desc">${esc(PR[c])}</div></div>`
+    : `<div class="hit"><div class="code">${c}</div><div class="desc notfound">PR-Code nicht in der aktuellen Datenbank gefunden.</div></div>`
+  ).join('');
+}
+</script>
+</body>
+</html>
