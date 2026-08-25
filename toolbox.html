@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VAG Toolbox – Übersicht</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:#fff;background:#01050b}
+.page{position:relative;width:100%;min-height:100dvh;padding:34px 20px;background:#01050b url('vag-toolbox-login.jpg?v=17') center/cover fixed no-repeat}
+.page:before{content:"";position:fixed;inset:0;background:rgba(1,5,11,.34);pointer-events:none}
+.shell{position:relative;z-index:1;width:min(1050px,100%);margin:0 auto}
+.header{background:rgba(2,14,27,.90);border:1px solid rgba(34,104,151,.75);border-radius:18px;padding:22px 26px;box-shadow:0 18px 55px rgba(0,0,0,.45);backdrop-filter:blur(6px);display:flex;align-items:center;gap:16px}
+.lock{width:48px;height:48px;flex:0 0 48px;border:2px solid #11a9ff;border-radius:50%;display:grid;place-items:center;font-size:23px;box-shadow:0 0 18px rgba(0,157,255,.28)}
+h1{font-size:30px;margin:0 0 2px;font-weight:800;letter-spacing:-.6px}.by{font-size:17px;font-weight:700;font-style:italic;color:#18a8ff}.sub{font-size:13px;color:#b7c9d8;margin-top:4px}.headtext{flex:1}
+.actions{display:flex;gap:8px}.btn{height:40px;padding:0 15px;border:1px solid rgba(47,99,135,.75);background:rgba(8,28,45,.9);color:#dcecff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}.btn:hover{border-color:#19aaff;background:rgba(12,43,68,.95)}
+.title{margin:28px 2px 12px;font-size:21px;font-weight:800}.intro{margin:0 2px 18px;color:#aebfce;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.tool{position:relative;overflow:hidden;background:rgba(2,14,27,.90);border:1px solid rgba(34,104,151,.75);border-radius:16px;padding:20px;box-shadow:0 14px 38px rgba(0,0,0,.35);backdrop-filter:blur(6px);transition:.18s ease}
+.tool:hover{transform:translateY(-2px);border-color:#19aaff;box-shadow:0 18px 45px rgba(0,0,0,.45)}
+.toolicon{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#0878ed,#0ba6ff);display:grid;place-items:center;font-size:19px;font-weight:900;margin-bottom:15px;box-shadow:0 0 22px rgba(0,157,255,.18)}
+.tool h2{margin:0 0 6px;font-size:20px}.tool p{margin:0;color:#aebfce;font-size:13px;line-height:1.5}.toolfooter{margin-top:18px;display:flex;justify-content:space-between;align-items:center;gap:10px}.open{border:0;border-radius:8px;height:40px;padding:0 18px;background:linear-gradient(90deg,#0878ed,#0ba6ff);color:#fff;font-size:13px;font-weight:800;cursor:pointer}.open:hover{filter:brightness(1.08)}
+.badge{font-size:10px;color:#7fd0ff;border:1px solid rgba(25,170,255,.4);background:rgba(8,44,69,.65);padding:5px 8px;border-radius:999px;font-weight:700}
+.coming{opacity:.62}.coming:hover{transform:none;border-color:rgba(34,104,151,.75);box-shadow:0 14px 38px rgba(0,0,0,.35)}
+.footer{text-align:center;color:#8198aa;font-size:10px;margin:22px 0 4px}
+@media(max-width:700px){.page{padding:18px 12px;background-attachment:scroll}.header{padding:18px;align-items:flex-start}.lock{width:42px;height:42px;flex-basis:42px;font-size:20px}h1{font-size:24px}.by{font-size:15px}.actions{flex-direction:column}.btn{height:36px;padding:0 11px}.grid{grid-template-columns:1fr}.title{margin-top:22px}.tool{padding:18px}}
+</style>
+<script>
+const U='https://mjvqdhclkqgrvqfaafzp.supabase.co';
+const K='sb_publishable_H4rBbPLak0JM-9pU2ympmw_sK9Wc1En';
+(async()=>{
+ const t=localStorage.getItem('mk100_token')||sessionStorage.getItem('mk100_token');
+ if(!t){location.replace('index.html');return}
+ try{
+  const u=await fetch(U+'/auth/v1/user',{headers:{apikey:K,Authorization:'Bearer '+t}});
+  if(!u.ok)throw 0;
+  const user=await u.json();
+  const r=await fetch(U+'/rest/v1/mk100_members?select=status,is_active&user_id=eq.'+encodeURIComponent(user.id),{headers:{apikey:K,Authorization:'Bearer '+t}});
+  if(!r.ok)throw 0;
+  const a=await r.json();
+  if(!a[0]||a[0].status!=='approved'||a[0].is_active!==true)throw 0;
+  document.documentElement.classList.add('ready');
+ }catch(e){
+  localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');location.replace('index.html?access=denied');
+ }
+})();
+function logout(){localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');location.href='index.html'}
+</script>
+</head>
+<body>
+<div class="page">
+ <main class="shell">
+  <header class="header">
+   <div class="lock">🔒</div>
+   <div class="headtext"><h1>VAG Toolbox</h1><div class="by">by Lukas Kopper</div><div class="sub">Geschützter Mitgliederbereich</div></div>
+   <div class="actions"><button class="btn" onclick="location.href='rechner.html'">MK100 ABS</button><button class="btn" onclick="logout()">ABMELDEN</button></div>
+  </header>
+
+  <h2 class="title">Tools</h2>
+  <p class="intro">Wähle das gewünschte Werkzeug aus. Weitere VAG-Tools können hier später ergänzt werden.</p>
+
+  <section class="grid">
+   <article class="tool">
+    <div class="toolicon">ABS</div>
+    <h2>MK100 ABS Codierungsrechner</h2>
+    <p>Berechnung der MK100 ABS-Codierung anhand von VIN, Fahrzeugdaten und den verfügbaren Konfigurationsoptionen.</p>
+    <div class="toolfooter"><span class="badge">AKTIV</span><button class="open" onclick="location.href='rechner.html'">TOOL ÖFFNEN</button></div>
+   </article>
+</section>
+
+  <div class="footer">Entwicklung und Programmierung von Lukas Kopper / l.kopper16@gmail.com</div>
+ </main>
+</div>
+</body>
+</html>
