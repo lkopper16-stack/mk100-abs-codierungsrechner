@@ -28,12 +28,12 @@ const U='https://mjvqdhclkqgrvqfaafzp.supabase.co',K='sb_publishable_H4rBbPLak0J
  <section class="card"><div class="statusHero"><div id="ring" class="ring"><div class="ringin"><strong id="score">–</strong><span>DPF-Zustandsindex</span></div></div><div><div id="verdict" class="verdict">–</div><div id="reason" class="reason"></div><div id="warning" class="warning" hidden></div></div></div></section>
  <section class="card"><h2>Messwerte und Bewertung</h2><div id="metrics" class="metrics"></div></section>
  <section class="card"><h2>Plausibilitätsprüfung</h2><div id="checks" class="checks"></div></section>
- <section class="card sources"><b>Bewertungsgrundlage:</b> Das CFCA-Profil nutzt die dokumentierten CR-TDI-Regenerationsbereiche 30/40/45 g. Asche- und Differenzdruckwerte werden mangels universeller Herstellerschwelle nur als Trend bzw. im Betriebspunkt bewertet. Die Auswertung ersetzt keine geführte Diagnose oder Werkstattprüfung.<br><a href="https://wiki.ross-tech.com/wiki/index.php/Diesel_Particle_Filter_Emergency_Regeneration">Ross-Tech: DPF Emergency Regeneration</a> · <a href="https://static.nhtsa.gov/odi/tsbs/2011/MC-10238581-9999.pdf">VW Technical Tip 26-11-01</a> · <a href="https://www.bosch-mobility.com/en/solutions/sensors/differential-pressure-sensor/">Bosch: Differenzdrucksensor</a></section>
+ <section class="card sources"><b>Bewertungsgrundlage:</b> Das T5-2.0-TDI-Profil nutzt die dokumentierten CR-TDI-Regenerationsbereiche 30/40/45 g. Asche- und Differenzdruckwerte werden mangels universeller Herstellerschwelle nur als Trend bzw. im Betriebspunkt bewertet. Die Auswertung ersetzt keine geführte Diagnose oder Werkstattprüfung.<br><a href="https://wiki.ross-tech.com/wiki/index.php/Diesel_Particle_Filter_Emergency_Regeneration">Ross-Tech: DPF Emergency Regeneration</a> · <a href="https://static.nhtsa.gov/odi/tsbs/2011/MC-10238581-9999.pdf">VW Technical Tip 26-11-01</a> · <a href="https://www.bosch-mobility.com/en/solutions/sensors/differential-pressure-sensor/">Bosch: Differenzdrucksensor</a></section>
 </main><div class="footer">Entwicklung und Programmierung von Lukas Kopper / l.kopper16@gmail.com</div>
 </div><script>
 const $=id=>document.getElementById(id);let current=null,currentData=null,currentName='';
 const PROFILES={
- crcan:{title:'1.6/2.0 CR-TDI CAN',source:'Diagnoseprofil 30/40/45 g',max:45,warn:40,limits:[18,30,40,45]},
+ crcan:{title:'VW T5 2.0 TDI · CR-TDI CAN',source:'T5-Profil mit Diagnosegrenzen 30/40/45 g',max:45,warn:40,limits:[18,30,40,45]},
  vw2us:{title:'VW 2.0 TDI · dokumentierte US-Modelle',source:'Regenerationsbeginn 18,9 g; Prüfung über 39,9 g',max:39.9,warn:39.9,limits:[18.9,30,39.9,39.9]},
  v6old:{title:'2.7/3.0 V6 TDI · BKS/BMK/BUN',source:'harte Sicherheitsgrenze 68 g',max:68,warn:68,safetyOnly:true},
  vw3us:{title:'VW 3.0 TDI · dokumentierte US-Modelle',source:'Regenerationsbeginn 27 g; normal bis 39,9 g',max:39.9,warn:39.9,limits:[27,34,39.9,39.9]},
@@ -41,7 +41,7 @@ const PROFILES={
  pd:{title:'VAG PD/PPD-TDI',source:'ECU-Spezifikation erforderlich',max:null},
  neutral:{title:'Kein bestätigtes Grenzwertprofil',source:'nur Messwertdarstellung',max:null}
 };
-function profileFor(code,manual){if(manual&&manual!=='auto')return manual;code=String(code||'').toUpperCase();if(code==='CFCA')return'crcan';if(['BKS','BMK','BUN'].includes(code))return'v6old';return'neutral'}
+function profileFor(code,manual){if(manual&&manual!=='auto')return manual;code=String(code||'').toUpperCase();if(['CAAA','CAAB','CAAC','CCHA','CFCA'].includes(code))return'crcan';if(['BKS','BMK','BUN'].includes(code))return'v6old';return'neutral'}
 function logout(){localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');location.href='index.html'}
 function showMsg(t,e=false){$('msg').textContent=t;$('msg').className='msg'+(e?' error':'');$('msg').style.display=t?'block':'none'}
 function split(line,sep){let a=[],s='',q=false;for(let i=0;i<line.length;i++){let c=line[i];if(c==='"'){if(q&&line[i+1]==='"'){s+='"';i++}else q=!q}else if(c===sep&&!q){a.push(s.trim());s=''}else s+=c}a.push(s.trim());return a}
