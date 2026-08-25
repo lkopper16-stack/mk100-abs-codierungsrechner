@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VCDS Log Analyzer · VAG Toolbox</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#020812;--panel:rgba(4,18,32,.92);--line:rgba(36,111,160,.78);--text:#f4f8fc;--muted:#9fb5c7;--blue:#0aa5ff;--blue2:#0878ed;--danger:#ff6b6b}
+html{background:var(--bg)}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:linear-gradient(rgba(1,7,14,.62),rgba(1,7,14,.86)),url('vag-toolbox-login.jpg?v=23') center top/cover fixed no-repeat,var(--bg)}
+#app{display:none}.ready #app{display:block}.wrap{max-width:1240px;margin:auto;padding:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 18px 45px rgba(0,0,0,.3);backdrop-filter:blur(6px)}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.logo{width:52px;height:52px;border-radius:14px;border:1px solid rgba(33,170,255,.75);background:linear-gradient(135deg,#073a67,#0aa5ff);display:grid;place-items:center;font-weight:800}.title{flex:1;min-width:230px}
+h1{margin:0 0 4px;font-size:28px}h2{font-size:17px;color:#42b8ff;margin:0 0 14px}.sub,.muted{color:var(--muted);font-size:13px;line-height:1.45}.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{border:1px solid rgba(60,116,154,.72);border-radius:9px;padding:11px 15px;font-weight:700;cursor:pointer;background:rgba(8,28,45,.96);color:#dfefff}.primary{background:linear-gradient(90deg,var(--blue2),var(--blue));border-color:#16a8ff;color:#fff}button:disabled{opacity:.45;cursor:not-allowed}
+.drop{border:1px dashed rgba(55,166,230,.85);border-radius:14px;padding:22px;text-align:center;background:rgba(3,20,35,.72);transition:.15s}.drop.over{border-color:#5fd0ff;background:rgba(7,47,73,.82)}input[type=file]{display:none}.pick{display:inline-block;margin-top:12px}
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}.item{background:rgba(6,25,43,.8);border:1px solid rgba(47,99,135,.55);border-radius:10px;padding:10px}.item b{display:block;font-size:11px;text-transform:uppercase;color:#7fbfe7;margin-bottom:4px}.item span{font-size:14px;word-break:break-word}
+.controls{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:10px;align-items:end}.field label{display:block;font-size:11px;text-transform:uppercase;color:#7fbfe7;font-weight:700;margin:0 0 5px}.field select,.field input{width:100%;padding:11px;border:1px solid #52718a;border-radius:9px;background:#edf4ff;color:#101820;font-size:14px}
+.series{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}.series label{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid rgba(47,99,135,.5);border-radius:9px;background:rgba(6,25,43,.72);font-size:12px;min-width:0}.series span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.series input{accent-color:#0aa5ff}
+.chartbox{position:relative;height:430px;border:1px solid rgba(47,99,135,.55);border-radius:12px;background:#03101d;overflow:hidden;margin-top:14px}canvas{display:block;width:100%;height:100%}.hint{text-align:center;color:#7f9bae;font-size:11px;margin-top:7px}
+.range{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:9px;align-items:center;margin-top:12px}.range input{width:100%;accent-color:#0aa5ff}.range span{font-size:11px;color:#9fc2d8}
+.stats{overflow:auto;margin-top:14px}table{width:100%;border-collapse:collapse}th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left;font-size:12px}th{color:#66c5ff;background:#071727}.swatch{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px}
+.msg{display:none;margin-top:12px;padding:10px 12px;border-radius:9px;background:rgba(6,24,41,.96);border:1px solid #24506f;color:#d9efff;font-size:13px}.error{border-color:#8b3c45;color:#ffd7da}.footer{text-align:center;color:#7790a2;font-size:11px;padding:6px 0 18px}
+@media(max-width:850px){.summary{grid-template-columns:repeat(2,1fr)}.controls{grid-template-columns:1fr 1fr}.series{grid-template-columns:1fr 1fr}.chartbox{height:370px}}
+@media(max-width:600px){.wrap{padding:10px}.card{padding:15px;border-radius:14px}.summary,.controls,.series{grid-template-columns:1fr}.actions{width:100%}.actions button{flex:1}h1{font-size:23px}.chartbox{height:330px}.range{grid-template-columns:auto 1fr}.range .endlabel{grid-column:1}.range #to{grid-column:2}}
+</style>
+<script>
+const U='https://mjvqdhclkqgrvqfaafzp.supabase.co';
+const K='sb_publishable_H4rBbPLak0JM-9pU2ympmw_sK9Wc1En';
+let TOKEN='';
+(async()=>{
+ TOKEN=localStorage.getItem('mk100_token')||sessionStorage.getItem('mk100_token')||'';
+ if(!TOKEN){location.replace('index.html');return}
+ try{
+  let r=await fetch(U+'/auth/v1/user',{headers:{apikey:K,Authorization:'Bearer '+TOKEN}});if(!r.ok)throw 0;const user=await r.json();
+  r=await fetch(U+'/rest/v1/mk100_members?select=status,is_active&user_id=eq.'+encodeURIComponent(user.id),{headers:{apikey:K,Authorization:'Bearer '+TOKEN}});if(!r.ok)throw 0;const a=await r.json();
+  if(!a[0]||a[0].status!=='approved'||a[0].is_active!==true)throw 0;
+  document.documentElement.classList.add('ready');
+ }catch(e){localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');location.replace('index.html?access=denied')}
+})();
+</script>
+</head>
+<body>
+<div id="app"><div class="wrap">
+ <div class="card"><div class="top">
+  <div class="logo">CSV</div><div class="title"><h1>VCDS Log Analyzer</h1><div class="sub">VAG Toolbox by Lukas Kopper · Messwertaufzeichnungen visualisieren und auswerten</div></div>
+  <div class="actions"><button onclick="location.href='toolbox.html'">← TOOLBOX</button><button onclick="logout()">ABMELDEN</button></div>
+ </div></div>
+
+ <div class="card">
+  <h2>Messwert-Log laden</h2>
+  <div id="drop" class="drop">
+   <div><b>VCDS-Messwertdatei hier ablegen</b></div><div class="muted">Unterstützt CSV- und TSV-Dateien bis 20 MB. Die Auswertung erfolgt ausschließlich lokal im Browser.</div>
+   <label class="pick"><input id="file" type="file" accept=".csv,.tsv,.txt,text/csv,text/plain"> <span class="primary" style="display:inline-block;padding:11px 15px;border-radius:9px;cursor:pointer">DATEI AUSWÄHLEN</span></label>
+  </div>
+  <div id="msg" class="msg"></div>
+  <div id="summary" class="summary" hidden>
+   <div class="item"><b>Datei</b><span id="sName">–</span></div><div class="item"><b>Datenpunkte</b><span id="sRows">–</span></div><div class="item"><b>Messwerte</b><span id="sCols">–</span></div><div class="item"><b>Trennzeichen</b><span id="sSep">–</span></div>
+  </div>
+ </div>
+
+ <div id="analysis" class="card" hidden>
+  <h2>Diagramm</h2>
+  <div class="controls">
+   <div class="field"><label>X-Achse</label><select id="xAxis"></select></div>
+   <div class="field"><label>Messwerte suchen</label><input id="filter" placeholder="z. B. Ladedruck" autocomplete="off"></div>
+   <div class="field"><label>Darstellung</label><select id="mode"><option value="separate">Eigene Skalierung je Kurve</option><option value="shared">Gemeinsame Y-Skala</option></select></div>
+   <button id="export" class="primary">BILD EXPORTIEREN</button>
+  </div>
+  <div id="series" class="series"></div>
+  <div class="range"><span>Start</span><input id="from" type="range" min="0" value="0"><span class="endlabel">Ende</span><input id="to" type="range" min="1" value="1"></div>
+  <div class="chartbox"><canvas id="chart"></canvas></div>
+  <div class="hint">Bewege den Finger oder Mauszeiger über das Diagramm, um Messwerte anzuzeigen.</div>
+  <div class="stats"><table><thead><tr><th>Messwert</th><th>Einheit</th><th>Minimum</th><th>Maximum</th><th>Durchschnitt</th><th>Werte</th></tr></thead><tbody id="stats"></tbody></table></div>
+ </div>
+ <div class="footer">Entwicklung und Programmierung von Lukas Kopper / l.kopper16@gmail.com</div>
+</div></div>
+
+<script>
+const $=id=>document.getElementById(id),COLORS=['#1db4ff','#ffba49','#ff6b7a','#53e08a','#b88cff','#ff8f45','#43e6dc','#f46de2'];
+let data={headers:[],units:[],rows:[],separator:''},selected=[],hover=-1;
+function logout(){localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');location.href='index.html'}
+function message(t,error=false){$('msg').textContent=t;$('msg').className='msg'+(error?' error':'');$('msg').style.display=t?'block':'none'}
+function detectSep(lines){const candidates=[';','\t',','];let best=';',score=-1;for(const s of candidates){const counts=lines.slice(0,20).map(x=>splitRow(x,s).length).filter(n=>n>1);if(counts.length){const common=Math.max(...counts.map(n=>counts.filter(x=>x===n).length));const v=common*100+Math.max(...counts);if(v>score){score=v;best=s}}}return best}
+function splitRow(line,sep){const out=[];let cur='',q=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}else if(c===sep&&!q){out.push(cur.trim());cur=''}else cur+=c}out.push(cur.trim());return out}
+function numberValue(v){if(v==null)return NaN;let s=String(v).trim().replace(/\u00a0/g,'').replace(/\s(?=\d{3}(?:\D|$))/g,'');if(!s||/^[-–—]$/.test(s))return NaN;s=s.replace(/[^0-9eE+.,-]/g,'');if(s.includes(',')&&s.includes('.')){if(s.lastIndexOf(',')>s.lastIndexOf('.'))s=s.replace(/\./g,'').replace(',','.');else s=s.replace(/,/g,'')}else if(s.includes(','))s=s.replace(',','.');const n=Number(s);return Number.isFinite(n)?n:NaN}
+function uniqueHeaders(a){const seen={};return a.map((x,i)=>{let n=(x||'Spalte '+(i+1)).replace(/^\uFEFF/,'').trim();seen[n]=(seen[n]||0)+1;return seen[n]>1?n+' ('+seen[n]+')':n})}
+function parse(text){const lines=text.replace(/\r/g,'').split('\n').filter(x=>x.trim());if(lines.length<3)throw Error('Die Datei enthält zu wenige Datenzeilen.');const sep=detectSep(lines);const all=lines.map(x=>splitRow(x,sep));let hi=-1,best=-1;for(let i=0;i<Math.min(all.length,80);i++){const row=all[i],non=row.filter(Boolean).length,next=all[i+1]||[];const words=row.filter(v=>/[A-Za-zÄÖÜäöü]/.test(v)).length;const numeric=next.filter(v=>Number.isFinite(numberValue(v))).length;const score=non+words*2+numeric*3;if(row.length>2&&score>best){best=score;hi=i}}
+ if(hi<0)throw Error('Keine Tabellenüberschrift erkannt.');let headers=uniqueHeaders(all[hi]);let unitRow=all[hi+1]||[];const isUnits=unitRow.length===headers.length&&unitRow.filter(v=>v&&/[A-Za-z%°\/]/.test(v)).length>=Math.max(1,headers.length/4)&&unitRow.filter(v=>Number.isFinite(numberValue(v))).length<headers.length/3;const units=isUnits?unitRow.map(v=>v.trim()):headers.map(()=> '');const start=hi+(isUnits?2:1);const rows=all.slice(start).filter(r=>r.some(v=>Number.isFinite(numberValue(v)))).map(r=>headers.map((_,i)=>r[i]??''));if(rows.length<2)throw Error('Keine auswertbaren Messwertzeilen erkannt.');
+ const keep=headers.map((_,i)=>rows.filter(r=>Number.isFinite(numberValue(r[i]))).length>=Math.max(2,rows.length*.25));headers=headers.filter((_,i)=>keep[i]);const u=units.filter((_,i)=>keep[i]);const rr=rows.map(r=>r.filter((_,i)=>keep[i]));if(headers.length<2)throw Error('Zu wenige numerische Messwertspalten erkannt.');return{headers,units:u,rows:rr,separator:sep}}
+async function loadFile(file){message('');if(!file)return;if(file.size>20*1024*1024){message('Die Datei ist größer als 20 MB.',true);return}try{const buf=await file.arrayBuffer();let text=new TextDecoder('utf-8').decode(buf);if((text.match(/�/g)||[]).length>3)text=new TextDecoder('windows-1252').decode(buf);data=parse(text);$('sName').textContent=file.name;$('sRows').textContent=data.rows.length.toLocaleString('de-DE');$('sCols').textContent=data.headers.length;$('sSep').textContent=data.separator==='\t'?'Tabulator':data.separator===';'?'Semikolon':'Komma';$('summary').hidden=false;$('analysis').hidden=false;setup();message('Datei erfolgreich eingelesen.')}catch(e){$('summary').hidden=true;$('analysis').hidden=true;message(e.message||'Datei konnte nicht gelesen werden.',true)}}
+function setup(){$('xAxis').innerHTML=data.headers.map((h,i)=>`<option value="${i}">${escapeHtml(h)}${data.units[i]?' ['+escapeHtml(data.units[i])+']':''}</option>`).join('');let time=data.headers.findIndex(h=>/zeit|time|sec|stamp/i.test(h));$('xAxis').value=time>=0?time:0;selected=data.headers.map((_,i)=>i).filter(i=>i!==Number($('xAxis').value)).slice(0,3);$('from').max=data.rows.length-2;$('to').max=data.rows.length-1;$('from').value=0;$('to').value=data.rows.length-1;renderSeries();draw()}
+function escapeHtml(s){return String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}
+function renderSeries(){const q=$('filter').value.toLowerCase(),x=Number($('xAxis').value);$('series').innerHTML=data.headers.map((h,i)=>({h,i})).filter(o=>o.i!==x&&(!q||(o.h+' '+data.units[o.i]).toLowerCase().includes(q))).map(o=>`<label title="${escapeHtml(o.h)}"><input type="checkbox" value="${o.i}" ${selected.includes(o.i)?'checked':''}><span>${escapeHtml(o.h)}${data.units[o.i]?' · '+escapeHtml(data.units[o.i]):''}</span></label>`).join('');$('series').querySelectorAll('input').forEach(el=>el.onchange=()=>{const i=Number(el.value);if(el.checked){if(selected.length>=8){el.checked=false;message('Maximal acht Messwerte gleichzeitig.',true);return}selected.push(i)}else selected=selected.filter(x=>x!==i);message('');draw()})}
+function visible(){let a=Number($('from').value),b=Number($('to').value);if(a>=b){if(document.activeElement===$('from'))a=Math.max(0,b-1);else b=Math.min(data.rows.length-1,a+1);$('from').value=a;$('to').value=b}return[a,b]}
+function values(col,a,b){const out=[];for(let i=a;i<=b;i++){const n=numberValue(data.rows[i][col]);if(Number.isFinite(n))out.push(n)}return out}
+function fmt(n){if(!Number.isFinite(n))return '–';return n.toLocaleString('de-DE',{maximumFractionDigits:3})}
+function resize(){const c=$('chart'),dpr=Math.min(devicePixelRatio||1,2),r=c.getBoundingClientRect();const w=Math.max(300,Math.round(r.width*dpr)),h=Math.max(220,Math.round(r.height*dpr));if(c.width!==w||c.height!==h){c.width=w;c.height=h}return{c,ctx:c.getContext('2d'),w,h,dpr}}
+function draw(){if(!data.rows.length)return;const {c,ctx,w,h,dpr}=resize(),[a,b]=visible(),pad={l:58*dpr,r:20*dpr,t:24*dpr,b:42*dpr};ctx.clearRect(0,0,w,h);ctx.fillStyle='#03101d';ctx.fillRect(0,0,w,h);const active=selected.filter(i=>i!==Number($('xAxis').value));const stats=[];active.forEach((col,k)=>{const vs=values(col,a,b);if(vs.length)stats.push({col,k,vs,min:Math.min(...vs),max:Math.max(...vs),avg:vs.reduce((p,n)=>p+n,0)/vs.length})});
+ ctx.strokeStyle='rgba(130,180,210,.16)';ctx.lineWidth=dpr;ctx.fillStyle='#82a7be';ctx.font=(11*dpr)+'px Arial';for(let i=0;i<=5;i++){const y=pad.t+(h-pad.t-pad.b)*i/5;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke()}for(let i=0;i<=6;i++){const x=pad.l+(w-pad.l-pad.r)*i/6;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,h-pad.b);ctx.stroke();const ri=Math.round(a+(b-a)*i/6),label=data.rows[ri]?.[Number($('xAxis').value)]??ri;ctx.fillText(String(label).slice(0,14),x-16*dpr,h-15*dpr)}
+ let sharedMin=Infinity,sharedMax=-Infinity;if($('mode').value==='shared')for(const s of stats){sharedMin=Math.min(sharedMin,s.min);sharedMax=Math.max(sharedMax,s.max)}for(const s of stats){let min=$('mode').value==='shared'?sharedMin:s.min,max=$('mode').value==='shared'?sharedMax:s.max;if(max===min){max+=1;min-=1}ctx.strokeStyle=COLORS[s.k%COLORS.length];ctx.lineWidth=2*dpr;ctx.beginPath();let started=false;for(let ri=a;ri<=b;ri++){const n=numberValue(data.rows[ri][s.col]);if(!Number.isFinite(n)){started=false;continue}const x=pad.l+(w-pad.l-pad.r)*(ri-a)/Math.max(1,b-a),y=pad.t+(h-pad.t-pad.b)*(1-(n-min)/(max-min));if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y)}ctx.stroke()}
+ if(hover>=a&&hover<=b){const x=pad.l+(w-pad.l-pad.r)*(hover-a)/Math.max(1,b-a);ctx.strokeStyle='#fff';ctx.lineWidth=dpr;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,h-pad.b);ctx.stroke();let lines=active.map((col,k)=>({t:data.headers[col]+': '+fmt(numberValue(data.rows[hover][col]))+(data.units[col]?' '+data.units[col]:''),c:COLORS[k%COLORS.length]}));const bw=Math.min(390*dpr,w-pad.l-pad.r),bh=(22+lines.length*18)*dpr,bx=Math.min(x+9*dpr,w-bw-8*dpr),by=pad.t+6*dpr;ctx.fillStyle='rgba(2,10,18,.92)';ctx.fillRect(bx,by,bw,bh);ctx.font=(11*dpr)+'px Arial';lines.forEach((l,i)=>{ctx.fillStyle=l.c;ctx.fillText(l.t.slice(0,58),bx+9*dpr,by+(20+i*18)*dpr)})}
+ $('stats').innerHTML=stats.length?stats.map(s=>`<tr><td><span class="swatch" style="background:${COLORS[s.k%COLORS.length]}"></span>${escapeHtml(data.headers[s.col])}</td><td>${escapeHtml(data.units[s.col]||'–')}</td><td>${fmt(s.min)}</td><td>${fmt(s.max)}</td><td>${fmt(s.avg)}</td><td>${s.vs.length.toLocaleString('de-DE')}</td></tr>`).join(''):'<tr><td colspan="6">Bitte mindestens einen Messwert auswählen.</td></tr>'}
+function pointer(e){const c=$('chart'),r=c.getBoundingClientRect(),[a,b]=visible(),x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;hover=Math.max(a,Math.min(b,Math.round(a+(b-a)*(x/r.width))));draw()}
+$('file').onchange=e=>loadFile(e.target.files[0]);const drop=$('drop');['dragenter','dragover'].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.add('over')}));['dragleave','drop'].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.remove('over')}));drop.addEventListener('drop',e=>loadFile(e.dataTransfer.files[0]));$('filter').oninput=renderSeries;$('xAxis').onchange=()=>{selected=selected.filter(i=>i!==Number($('xAxis').value));renderSeries();draw()};$('mode').onchange=draw;$('from').oninput=draw;$('to').oninput=draw;$('chart').addEventListener('mousemove',pointer);$('chart').addEventListener('touchmove',e=>{e.preventDefault();pointer(e)},{passive:false});$('chart').addEventListener('mouseleave',()=>{hover=-1;draw()});$('export').onclick=()=>{draw();const a=document.createElement('a');a.download='VCDS-Log-Analyse.png';a.href=$('chart').toDataURL('image/png');a.click()};addEventListener('resize',draw);
+</script>
+</body>
+</html>
