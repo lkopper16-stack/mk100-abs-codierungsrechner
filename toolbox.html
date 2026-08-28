@@ -19,7 +19,7 @@ function logout(){localStorage.removeItem('mk100_token');sessionStorage.removeIt
 </script>
 </head>
 <body><div class="page"><main class="shell">
-<header class="header"><div class="lock">🔒</div><div class="headtext"><h1>VAG Toolbox</h1><div class="by">by Lukas Kopper</div><div class="sub">Geschützter Mitgliederbereich</div></div><div class="actions"><button class="btn" onclick="location.href='rechner.html'">MK100 ABS</button><button class="btn" onclick="logout()">ABMELDEN</button></div></header>
+<header class="header"><div class="lock">🔒</div><div class="headtext"><h1>VAG Toolbox</h1><div class="by">Diagnose &amp; Codierung</div><div class="sub">Geschützter Mitgliederbereich</div></div><div class="actions"><button class="btn" onclick="location.href='rechner.html'">MK100 ABS</button><button class="btn" onclick="logout()">ABMELDEN</button></div></header>
 <h2 class="title">Tools</h2><p class="intro">Wähle das gewünschte Werkzeug aus. Weitere VAG-Tools können hier später ergänzt werden.</p>
 <section class="grid">
  <article class="tool"><div class="toolicon">ABS</div><h2>MK100 ABS Codierungsrechner</h2><p>Berechnung der MK100 ABS-Codierung anhand von VIN, Fahrzeugdaten und den verfügbaren Konfigurationsoptionen.</p><div class="toolfooter"><span class="badge">AKTIV</span><button class="open" onclick="location.href='rechner.html'">TOOL ÖFFNEN</button></div></article>
@@ -28,5 +28,5 @@ function logout(){localStorage.removeItem('mk100_token');sessionStorage.removeIt
  <article class="tool"><div class="toolicon">DPF</div><h2>DPF Zustandsübersicht</h2><p>VCDS-DPF-Messwerte automatisch erkennen, Rußbeladung farbig bewerten und einen übersichtlichen PDF-Bericht erstellen.</p><div class="toolfooter"><span class="badge">NEU</span><button class="open" onclick="location.href='dpf-zustand.html'">TOOL ÖFFNEN</button></div></article>
  <article class="tool"><div class="toolicon">RAD</div><h2>Reifen- & Felgenvergleich</h2><p>Serien- und Wunschbereifung vergleichen: Abrollumfang, Tachoabweichung, Bodenfreiheit, Einpresstiefe und Spurplatten.</p><div class="toolfooter"><span class="badge">NEU</span><button class="open" onclick="location.href='reifen-felgen-rechner.html'">TOOL ÖFFNEN</button></div></article>
  <article class="tool"><div class="toolicon">PR</div><h2>PR-Nummern Decoder</h2><p>PR-Code eingeben und die zugehörige Ausstattung direkt auf Deutsch anzeigen.</p><div class="toolfooter"><span class="badge">AKTIV</span><button class="open" onclick="location.href='pr-decoder.html'">TOOL ÖFFNEN</button></div></article>
-</section><div class="footer">Entwicklung und Programmierung von Lukas Kopper / l.kopper16@gmail.com</div>
+</section><div class="footer">VAG Toolbox</div>
 </main></div></body></html>
