@@ -43,21 +43,21 @@ th{color:#66c5ff;font-size:12px;background:#071727}
 const U='https://mjvqdhclkqgrvqfaafzp.supabase.co';
 const K='sb_publishable_H4rBbPLak0JM-9pU2ympmw_sK9Wc1En';
 let TOKEN='',USER=null,ROWS=[],PARSED=null,FILE=null,RAW='';
+const apiHeaders=()=>TOKEN?{apikey:K,Authorization:'Bearer '+TOKEN}:{apikey:K};
 (async()=>{
   TOKEN=localStorage.getItem('mk100_token')||sessionStorage.getItem('mk100_token')||'';
-  if(!TOKEN){location.replace('index.html');return}
-  try{
-    let r=await fetch(U+'/auth/v1/user',{headers:{apikey:K,Authorization:'Bearer '+TOKEN}});
-    if(!r.ok)throw 0; USER=await r.json();
-    r=await fetch(U+'/rest/v1/mk100_members?select=status,is_active&user_id=eq.'+encodeURIComponent(USER.id),{headers:{apikey:K,Authorization:'Bearer '+TOKEN}});
-    if(!r.ok)throw 0; const a=await r.json();
-    if(!a[0]||a[0].status!=='approved'||a[0].is_active!==true)throw 0;
-    document.documentElement.classList.add('ready');
-    await loadArchive();
-  }catch(e){
-    localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');
-    location.replace('index.html?access=denied');
+  if(TOKEN){
+    try{
+      let r=await fetch(U+'/auth/v1/user',{headers:apiHeaders()});
+      if(r.ok) USER=await r.json(); else TOKEN='';
+    }catch(e){TOKEN=''}
   }
+  document.documentElement.classList.add('ready');
+  if(!USER){
+    const upload=$('uploadCard');
+    if(upload) upload.innerHTML='<h2>Öffentliches Log-Archiv</h2><div class="muted">Alle freigegebenen VCDS-Logs können ohne Anmeldung gesucht und heruntergeladen werden. Das Hochladen ist während des öffentlichen Betriebs deaktiviert.</div>';
+  }
+  await loadArchive();
 })();
 </script>
 </head>
@@ -65,11 +65,11 @@ let TOKEN='',USER=null,ROWS=[],PARSED=null,FILE=null,RAW='';
 <div id="app"><div class="wrap">
 <div class="card"><div class="top">
 <div class="logo">LOG</div>
-<div class="title"><h1>VCDS Log Archiv</h1><div class="sub">VAG Toolbox · VCDS Auto-Scans sammeln, durchsuchen und vergleichen</div></div>
-<div class="actions"><button onclick="location.href='toolbox.html'">← TOOLBOX</button><button onclick="logout()">ABMELDEN</button></div>
+<div class="title"><h1>VCDS Log Archiv</h1><div class="sub">VAG Toolbox · Öffentliche VCDS Auto-Scans durchsuchen und vergleichen</div></div>
+<div class="actions"><button onclick="location.href='toolbox.html'">← TOOLBOX</button></div>
 </div></div>
 
-<div class="card">
+<div class="card" id="uploadCard">
 <h2>Log hochladen</h2>
 <div class="uploadbox">
 <input id="file" type="file" accept=".txt,text/plain" onchange="pickFile(this.files[0])">
@@ -171,6 +171,7 @@ async function pickFile(file){
 }
 function encodePath(path){return path.split('/').map(encodeURIComponent).join('/')}
 async function uploadLog(){
+  if(!USER){show('Das Hochladen ist im öffentlichen Betrieb deaktiviert.');return}
   if(!FILE||!PARSED)return;
   const btn=$('uploadBtn');btn.disabled=true;show('Upload läuft …');
   try{
@@ -188,7 +189,7 @@ async function uploadLog(){
 }
 async function loadArchive(){
   try{
-    const r=await fetch(U+'/rest/v1/vcds_logs?select=id,created_at,storage_path,original_name,vin,vehicle,vehicle_type,model_year,mileage,engine_code,engine_desc,engine_part,transmission,gearbox_model,drivetrain,abs_part,abs_coding&order=created_at.desc&limit=1000',{headers:{apikey:K,Authorization:'Bearer '+TOKEN}});
+    const r=await fetch(U+'/rest/v1/vcds_logs?select=id,created_at,storage_path,original_name,vin,vehicle,vehicle_type,model_year,mileage,engine_code,engine_desc,engine_part,transmission,gearbox_model,drivetrain,abs_part,abs_coding&order=created_at.desc&limit=1000',{headers:apiHeaders()});
     if(!r.ok)throw Error(await r.text());
     ROWS=await r.json();fillFilters();render();
   }catch(e){$('rows').innerHTML='<tr><td colspan="8">Archiv noch nicht eingerichtet oder konnte nicht geladen werden.</td></tr>'}
@@ -214,7 +215,7 @@ async function runSearch(){
     ].join(',');
     const select='id,created_at,storage_path,original_name,vin,vehicle,vehicle_type,model_year,mileage,engine_code,engine_desc,engine_part,transmission,gearbox_model,drivetrain,abs_part,abs_coding';
     const url=U+'/rest/v1/vcds_logs?select='+encodeURIComponent(select)+'&or=('+encodeURIComponent(ors)+')&order=created_at.desc&limit=1000';
-    const r=await fetch(url,{headers:{apikey:K,Authorization:'Bearer '+TOKEN}});
+    const r=await fetch(url,{headers:apiHeaders()});
     if(!r.ok)throw Error(await r.text());
     ROWS=await r.json();fillFilters();render();
   }catch(e){$('rows').innerHTML='<tr><td colspan="8">Suche fehlgeschlagen.</td></tr>'}
@@ -254,11 +255,7 @@ async function downloadLog(path,name){
     const signUrl=U+'/storage/v1/object/sign/vcds-logs/'+encodePath(path);
     const sr=await fetch(signUrl,{
       method:'POST',
-      headers:{
-        apikey:K,
-        Authorization:'Bearer '+TOKEN,
-        'Content-Type':'application/json'
-      },
+      headers:{...apiHeaders(),'Content-Type':'application/json'},
       body:JSON.stringify({expiresIn:60})
     });
 
