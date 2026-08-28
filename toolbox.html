@@ -13,8 +13,7 @@ html,body{margin:0;width:100%;height:100%;min-height:100%;font-family:Arial,Helv
 @media(max-width:700px){.page{padding:18px 12px;background-attachment:scroll}.header{padding:18px;align-items:flex-start}.lock{width:42px;height:42px;flex-basis:42px;font-size:20px}h1{font-size:24px}.by{font-size:15px}.actions{flex-direction:column}.btn{height:36px;padding:0 11px}.grid{grid-template-columns:1fr}.title{margin-top:22px}.tool{padding:18px}}
 </style>
 <script>
-const U='https://mjvqdhclkqgrvqfaafzp.supabase.co';const K='sb_publishable_H4rBbPLak0JM-9pU2ympmw_sK9Wc1En';
-(async()=>{const t=localStorage.getItem('mk100_token')||sessionStorage.getItem('mk100_token');if(!t){location.replace('index.html');return}try{const u=await fetch(U+'/auth/v1/user',{headers:{apikey:K,Authorization:'Bearer '+t}});if(!u.ok)throw 0;const user=await u.json();const r=await fetch(U+'/rest/v1/mk100_members?select=status,is_active&user_id=eq.'+encodeURIComponent(user.id),{headers:{apikey:K,Authorization:'Bearer '+t}});if(!r.ok)throw 0;const a=await r.json();if(!a[0]||a[0].status!=='approved'||a[0].is_active!==true)throw 0;document.documentElement.classList.add('ready')}catch(e){localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');location.replace('index.html?access=denied')}})();
+document.documentElement.classList.add('ready');
 function logout(){localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');location.href='index.html'}
 </script>
 </head>
