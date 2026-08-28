@@ -44,21 +44,21 @@ const U='https://mjvqdhclkqgrvqfaafzp.supabase.co';
 const K='sb_publishable_H4rBbPLak0JM-9pU2ympmw_sK9Wc1En';
 let TOKEN='',USER=null,ROWS=[],PARSED=null,FILE=null,RAW='';
 const apiHeaders=()=>TOKEN?{apikey:K,Authorization:'Bearer '+TOKEN}:{apikey:K};
-(async()=>{
+window.addEventListener('DOMContentLoaded',async()=>{
   TOKEN=localStorage.getItem('mk100_token')||sessionStorage.getItem('mk100_token')||'';
   if(TOKEN){
     try{
-      let r=await fetch(U+'/auth/v1/user',{headers:apiHeaders()});
+      const r=await fetch(U+'/auth/v1/user',{headers:apiHeaders()});
       if(r.ok) USER=await r.json(); else TOKEN='';
     }catch(e){TOKEN=''}
   }
   document.documentElement.classList.add('ready');
   if(!USER){
-    const upload=$('uploadCard');
+    const upload=document.getElementById('uploadCard');
     if(upload) upload.innerHTML='<h2>Öffentliches Log-Archiv</h2><div class="muted">Alle freigegebenen VCDS-Logs können ohne Anmeldung gesucht und heruntergeladen werden. Das Hochladen ist während des öffentlichen Betriebs deaktiviert.</div>';
   }
   await loadArchive();
-})();
+});
 </script>
 </head>
 <body>
