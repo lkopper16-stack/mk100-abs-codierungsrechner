@@ -21,7 +21,7 @@ const U='https://mjvqdhclkqgrvqfaafzp.supabase.co',K='sb_publishable_H4rBbPLak0J
 </script>
 </head>
 <body><div class="wrap">
-<section class="card"><div class="top"><div class="logo">DPF</div><div class="title"><h1>DPF Zustandsübersicht</h1><div class="sub">VAG Toolbox by Lukas Kopper · VCDS-Messwerte lokal auswerten</div></div><div class="actions"><button onclick="location.href='toolbox.html'">← TOOLBOX</button><button id="pdf" class="primary" disabled>PDF ERSTELLEN</button></div></div></section>
+<section class="card"><div class="top"><div class="logo">DPF</div><div class="title"><h1>DPF Zustandsübersicht</h1><div class="sub">VAG Toolbox · VCDS-Messwerte lokal auswerten</div></div><div class="actions"><button onclick="location.href='toolbox.html'">← TOOLBOX</button><button id="pdf" class="primary" disabled>PDF ERSTELLEN</button></div></div></section>
 <section class="card uploadCard"><h2>VCDS-Datei einlesen</h2><div id="drop" class="drop"><b>CSV-, TSV- oder TXT-Datei hier ablegen</b><div class="muted">Die Datei wird nicht hochgeladen. Unterstützt werden deutsche und englische VCDS-Messwertnamen.</div><label class="pick"><input id="file" type="file" accept=".csv,.tsv,.txt,text/csv,text/plain">DATEI AUSWÄHLEN</label></div>
 <details class="loghelp" open><summary>Welche Messwerte müssen im VCDS-Log ausgewählt werden?</summary><div class="loghelpbody"><div class="loggrid">
 <div class="loggroup"><h3>Pflichtwerte</h3><ul>
@@ -58,7 +58,7 @@ const U='https://mjvqdhclkqgrvqfaafzp.supabase.co',K='sb_publishable_H4rBbPLak0J
  <section class="card"><h2>Messwerte und Bewertung</h2><div id="metrics" class="metrics"></div></section>
  <section class="card"><h2>Plausibilitätsprüfung</h2><div id="checks" class="checks"></div></section>
  <section class="card sources"><b>Bewertungsgrundlage:</b> Das T5-2.0-TDI-Profil nutzt die dokumentierten CR-TDI-Regenerationsbereiche 30/40/45 g. Asche- und Differenzdruckwerte werden mangels universeller Herstellerschwelle nur als Trend bzw. im Betriebspunkt bewertet. Die Auswertung ersetzt keine geführte Diagnose oder Werkstattprüfung.<br><a href="https://wiki.ross-tech.com/wiki/index.php/Diesel_Particle_Filter_Emergency_Regeneration">Ross-Tech: DPF Emergency Regeneration</a> · <a href="https://static.nhtsa.gov/odi/tsbs/2011/MC-10238581-9999.pdf">VW Technical Tip 26-11-01</a> · <a href="https://www.bosch-mobility.com/en/solutions/sensors/differential-pressure-sensor/">Bosch: Differenzdrucksensor</a></section>
-</main><div class="footer">Entwicklung und Programmierung von Lukas Kopper / l.kopper16@gmail.com</div>
+</main><div class="footer">VAG Toolbox</div>
 </div><script>
 const $=id=>document.getElementById(id);let current=null,currentData=null,currentName='';
 const PROFILES={
