@@ -45,13 +45,8 @@ const K='sb_publishable_H4rBbPLak0JM-9pU2ympmw_sK9Wc1En';
 let TOKEN='',USER=null,ROWS=[],PARSED=null,FILE=null,RAW='';
 const apiHeaders=()=>TOKEN?{apikey:K,Authorization:'Bearer '+TOKEN}:{apikey:K};
 window.addEventListener('DOMContentLoaded',async()=>{
-  TOKEN=localStorage.getItem('mk100_token')||sessionStorage.getItem('mk100_token')||'';
-  if(TOKEN){
-    try{
-      const r=await fetch(U+'/auth/v1/user',{headers:apiHeaders()});
-      if(r.ok) USER=await r.json(); else TOKEN='';
-    }catch(e){TOKEN=''}
-  }
+  TOKEN='';
+  USER=null;
   document.documentElement.classList.add('ready');
   if(!USER){
     const upload=document.getElementById('uploadCard');
