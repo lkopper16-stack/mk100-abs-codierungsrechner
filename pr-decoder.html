@@ -31,25 +31,7 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(10,165,255,.18)}
 @media(max-width:600px){.wrap{padding:10px}.card{padding:15px;border-radius:14px}.search{grid-template-columns:1fr}.actions{width:100%}.actions button{flex:1}h1{font-size:23px}}
 </style>
 <script>
-const U='https://mjvqdhclkqgrvqfaafzp.supabase.co';
-const K='sb_publishable_H4rBbPLak0JM-9pU2ympmw_sK9Wc1En';
-(async()=>{
- const t=localStorage.getItem('mk100_token')||sessionStorage.getItem('mk100_token');
- if(!t){location.replace('index.html');return}
- try{
-   const u=await fetch(U+'/auth/v1/user',{headers:{apikey:K,Authorization:'Bearer '+t}});
-   if(!u.ok)throw 0;
-   const user=await u.json();
-   const r=await fetch(U+'/rest/v1/mk100_members?select=status,is_active&user_id=eq.'+encodeURIComponent(user.id),{headers:{apikey:K,Authorization:'Bearer '+t}});
-   if(!r.ok)throw 0;
-   const a=await r.json();
-   if(!a[0]||a[0].status!=='approved'||a[0].is_active!==true)throw 0;
-   document.documentElement.classList.add('ready');
- }catch(e){
-   localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');
-   location.replace('index.html?access=denied');
- }
-})();
+document.documentElement.classList.add('ready');
 </script>
 </head>
 <body>
