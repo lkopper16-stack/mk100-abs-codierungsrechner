@@ -58,6 +58,61 @@ html.phone .brand p,html.phone .hint{font-size:16px;line-height:1.5}
 html.phone .tabs button{min-height:52px;font-size:16px}
 html.phone .toast{left:12px;right:12px;bottom:18px;font-size:16px;padding:15px}
 
+
+/* Großformatige mobile Arbeitsansicht – unabhängig vom Browsermodus */
+@media(max-width:950px){
+  body{font-size:20px!important}
+  .app{width:100%!important;max-width:none!important}
+  .appbar{padding:20px 18px!important}
+  .appbarrow{gap:16px!important}
+  .appbar img{width:78px!important;height:78px!important}
+  .appbar h1{font-size:30px!important;line-height:1.08!important}
+  .appbar .shop{font-size:17px!important;margin-top:5px!important}
+  .iconbtn,.back{width:62px!important;height:62px!important;min-width:62px!important;font-size:27px!important;border-radius:17px!important}
+  .content{padding:22px 18px 40px!important}
+  .search{gap:12px!important}
+  .search input{height:68px!important;font-size:21px!important;padding:0 20px!important;border-radius:18px!important}
+  .add{width:68px!important;height:68px!important;flex-basis:68px!important;font-size:39px!important;border-radius:18px!important}
+  .stats{gap:12px!important;margin:20px 0 30px!important}
+  .stat{padding:19px 14px!important;border-radius:18px!important}
+  .stat b{font-size:34px!important;line-height:1.1!important}
+  .stat span{font-size:14px!important;line-height:1.3!important}
+  .sectionhead{margin:30px 2px 16px!important;gap:10px!important}
+  .sectionhead h2{font-size:26px!important}
+  .sectionhead span{font-size:15px!important}
+  .archiveBtn{height:48px!important;padding:0 15px!important;font-size:13px!important;border-radius:13px!important}
+  .cases{grid-template-columns:1fr!important;gap:16px!important}
+  .case{width:100%!important;min-height:190px!important;padding:24px!important;border-radius:22px!important}
+  .caseTop{gap:13px!important}
+  .plate{font-size:31px!important;line-height:1.15!important}
+  .status{font-size:14px!important;padding:9px 13px!important}
+  .vehicle{font-size:21px!important;margin-top:15px!important}
+  .caseMeta{display:flex!important;font-size:16px!important;line-height:1.5!important;gap:10px 20px!important;margin-top:18px!important}
+  .empty{font-size:19px!important;line-height:1.55!important;padding:44px 22px!important}
+  .detailTitle b{font-size:27px!important}
+  .detailTitle span{font-size:16px!important}
+  .detailcard{padding:22px!important;border-radius:20px!important}
+  .detailgrid,.files{grid-template-columns:1fr!important;gap:15px!important}
+  .kv{padding:8px 2px!important}
+  .kv b{font-size:14px!important;margin-bottom:7px!important}
+  .kv span{font-size:21px!important;line-height:1.4!important}
+  .quick{grid-template-columns:1fr!important;gap:12px!important}
+  .quick button,.downloadArchive,.primary,.secondary{min-height:62px!important;font-size:18px!important}
+  .filebody{padding:17px!important}
+  .filebody b{font-size:18px!important;margin-top:5px!important}
+  .filebody small,.category{font-size:14px!important}
+  .filebody button{height:58px!important;font-size:17px!important}
+  .uploadbar{padding:13px 18px calc(13px + env(safe-area-inset-bottom))!important;gap:12px!important}
+  .uploadbar label{height:62px!important;font-size:16px!important}
+  .field{margin:18px 0!important}
+  .field label{font-size:16px!important;margin-bottom:9px!important}
+  .field input,.field select,.field textarea{font-size:20px!important;padding:17px!important}
+  .modal{padding:23px!important}
+  .modalhead h2{font-size:27px!important}
+  .modalactions{grid-template-columns:1fr!important}
+  .member{font-size:16px!important;padding:15px!important}
+}
+
 </style><script src="jszip.min.js"></script></head><body>
 <section id="authScreen" class="screen auth"><div class="authbox"><div class="brand"><img src="mechanix-deluxe-app.png" alt=""><div><h1>Werkstatt Tool</h1><p>Gemeinsame Fahrzeugakten für dein Team</p></div></div><div class="tabs"><button id="loginTab" class="active">Anmelden</button><button id="registerTab">Registrieren</button></div><form id="authForm"><div id="nameField" class="field hidden"><label>Anzeigename</label><input id="displayName" maxlength="60"></div><div class="field"><label>E-Mail</label><input id="email" type="email" required autocomplete="email"></div><div class="field"><label>Passwort</label><input id="password" type="password" minlength="8" required autocomplete="current-password"></div><button id="authSubmit" class="primary authSubmit">ANMELDEN</button></form><div id="authMsg" class="msg"></div></div></section>
 <section id="onboardScreen" class="screen onboard hidden"><div class="onboardbox"><div class="brand"><img src="mechanix-deluxe-app.png"><div><h1>Werkstatt einrichten</h1><p>Erstelle eine Werkstatt oder nutze einen Einladungslink.</p></div></div><div id="shopList" class="shops"></div><div class="field"><label>Neue Werkstatt</label><input id="newShop" maxlength="80" placeholder="z. B. Mustermann Kfz-Technik"></div><button id="createShop" class="primary">WERKSTATT ERSTELLEN</button><div id="joinHint" class="msg"></div><button id="onboardSignout" class="secondary" style="margin-top:14px">ABMELDEN</button></div></section>
