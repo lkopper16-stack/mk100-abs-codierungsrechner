@@ -16,7 +16,7 @@ create table if not exists public.photo_groups (
 );
 create table if not exists public.photo_group_members (
   group_id uuid not null references public.photo_groups(id) on delete cascade,
-  user_id uuid not null references auth.users(id) on delete cascade,
+  user_id uuid not null references public.photo_profiles(user_id) on delete cascade,
   role text not null default 'member' check (role in ('owner','admin','member')),
   created_at timestamptz not null default now(),
   primary key(group_id,user_id)
@@ -41,6 +41,17 @@ create table if not exists public.photo_group_images (
   size_bytes bigint not null check(size_bytes between 1 and 104857600),
   created_at timestamptz not null default now()
 );
+
+create or replace function public.photo_is_member(gid uuid)
+returns boolean language sql stable security definer set search_path=public as $
+ select exists(select 1 from photo_group_members where group_id=gid and user_id=auth.uid())
+$;
+create or replace function public.photo_is_admin(gid uuid)
+returns boolean language sql stable security definer set search_path=public as $
+ select exists(select 1 from photo_group_members where group_id=gid and user_id=auth.uid() and role in('owner','admin'))
+$;
+grant execute on function public.photo_is_member(uuid) to authenticated;
+grant execute on function public.photo_is_admin(uuid) to authenticated;
 
 create or replace function public.photo_new_user() returns trigger language plpgsql security definer set search_path=public as $$
 begin
@@ -99,11 +110,11 @@ alter table photo_group_images enable row level security;
 
 drop policy if exists photo_groups_read on photo_groups;
 create policy photo_groups_read on photo_groups for select to authenticated using(
- exists(select 1 from photo_group_members m where m.group_id=id and m.user_id=auth.uid())
+ public.photo_is_member(id)
 );
 drop policy if exists photo_members_read on photo_group_members;
 create policy photo_members_read on photo_group_members for select to authenticated using(
- exists(select 1 from photo_group_members mine where mine.group_id=photo_group_members.group_id and mine.user_id=auth.uid())
+ public.photo_is_member(photo_group_members.group_id)
 );
 drop policy if exists photo_profiles_read on photo_profiles;
 create policy photo_profiles_read on photo_profiles for select to authenticated using(
@@ -114,19 +125,19 @@ create policy photo_profiles_read on photo_profiles for select to authenticated 
 );
 drop policy if exists photo_invites_read on photo_group_invites;
 create policy photo_invites_read on photo_group_invites for select to authenticated using(
- exists(select 1 from photo_group_members m where m.group_id=photo_group_invites.group_id and m.user_id=auth.uid() and m.role in('owner','admin'))
+ public.photo_is_admin(photo_group_invites.group_id)
 );
 drop policy if exists photo_images_read on photo_group_images;
 create policy photo_images_read on photo_group_images for select to authenticated using(
- exists(select 1 from photo_group_members m where m.group_id=photo_group_images.group_id and m.user_id=auth.uid())
+ public.photo_is_member(photo_group_images.group_id)
 );
 drop policy if exists photo_images_insert on photo_group_images;
 create policy photo_images_insert on photo_group_images for insert to authenticated with check(
- uploader_id=auth.uid() and exists(select 1 from photo_group_members m where m.group_id=photo_group_images.group_id and m.user_id=auth.uid())
+ uploader_id=auth.uid() and public.photo_is_member(photo_group_images.group_id)
 );
 drop policy if exists photo_images_delete on photo_group_images;
 create policy photo_images_delete on photo_group_images for delete to authenticated using(
- uploader_id=auth.uid() or exists(select 1 from photo_group_members m where m.group_id=photo_group_images.group_id and m.user_id=auth.uid() and m.role in('owner','admin'))
+ uploader_id=auth.uid() or public.photo_is_admin(photo_group_images.group_id)
 );
 
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
@@ -135,22 +146,13 @@ on conflict(id) do update set public=false,file_size_limit=104857600,allowed_mim
 
 drop policy if exists photo_storage_read on storage.objects;
 create policy photo_storage_read on storage.objects for select to authenticated using(
- bucket_id='group-photos' and exists(
-  select 1 from public.photo_group_members m
-  where m.group_id=(storage.foldername(name))[1]::uuid and m.user_id=auth.uid()
- )
+ bucket_id='group-photos' and public.photo_is_member((storage.foldername(name))[1]::uuid)
 );
 drop policy if exists photo_storage_insert on storage.objects;
 create policy photo_storage_insert on storage.objects for insert to authenticated with check(
- bucket_id='group-photos' and (storage.foldername(name))[2]=auth.uid()::text and exists(
-  select 1 from public.photo_group_members m
-  where m.group_id=(storage.foldername(name))[1]::uuid and m.user_id=auth.uid()
- )
+ bucket_id='group-photos' and (storage.foldername(name))[2]=auth.uid()::text and public.photo_is_member((storage.foldername(name))[1]::uuid)
 );
 drop policy if exists photo_storage_delete on storage.objects;
 create policy photo_storage_delete on storage.objects for delete to authenticated using(
- bucket_id='group-photos' and ((storage.foldername(name))[2]=auth.uid()::text or exists(
-  select 1 from public.photo_group_members m
-  where m.group_id=(storage.foldername(name))[1]::uuid and m.user_id=auth.uid() and m.role in('owner','admin')
- ))
+ bucket_id='group-photos' and ((storage.foldername(name))[2]=auth.uid()::text or public.photo_is_admin((storage.foldername(name))[1]::uuid))
 );
