@@ -43,13 +43,13 @@ create table if not exists public.photo_group_images (
 );
 
 create or replace function public.photo_is_member(gid uuid)
-returns boolean language sql stable security definer set search_path=public as $
+returns boolean language sql stable security definer set search_path=public as \$\$
  select exists(select 1 from photo_group_members where group_id=gid and user_id=auth.uid())
-$;
+\$\$;
 create or replace function public.photo_is_admin(gid uuid)
-returns boolean language sql stable security definer set search_path=public as $
+returns boolean language sql stable security definer set search_path=public as \$\$
  select exists(select 1 from photo_group_members where group_id=gid and user_id=auth.uid() and role in('owner','admin'))
-$;
+\$\$;
 grant execute on function public.photo_is_member(uuid) to authenticated;
 grant execute on function public.photo_is_admin(uuid) to authenticated;
 
