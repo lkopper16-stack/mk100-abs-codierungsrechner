@@ -28,26 +28,14 @@ button{border:1px solid rgba(60,116,154,.72);border-radius:9px;padding:11px 15px
 @media(max-width:600px){.wrap{padding:10px}.card{padding:15px;border-radius:14px}.summary,.controls,.series{grid-template-columns:1fr}.actions{width:100%}.actions button{flex:1}h1{font-size:23px}.chartbox{height:330px}.range{grid-template-columns:auto 1fr}.range .endlabel{grid-column:1}.range #to{grid-column:2}}
 </style>
 <script>
-const U='https://mjvqdhclkqgrvqfaafzp.supabase.co';
-const K='sb_publishable_H4rBbPLak0JM-9pU2ympmw_sK9Wc1En';
-let TOKEN='';
-(async()=>{
- TOKEN=localStorage.getItem('mk100_token')||sessionStorage.getItem('mk100_token')||'';
- if(!TOKEN){location.replace('index.html');return}
- try{
-  let r=await fetch(U+'/auth/v1/user',{headers:{apikey:K,Authorization:'Bearer '+TOKEN}});if(!r.ok)throw 0;const user=await r.json();
-  r=await fetch(U+'/rest/v1/mk100_members?select=status,is_active&user_id=eq.'+encodeURIComponent(user.id),{headers:{apikey:K,Authorization:'Bearer '+TOKEN}});if(!r.ok)throw 0;const a=await r.json();
-  if(!a[0]||a[0].status!=='approved'||a[0].is_active!==true)throw 0;
-  document.documentElement.classList.add('ready');
- }catch(e){localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');location.replace('index.html?access=denied')}
-})();
+document.documentElement.classList.add('ready');
 </script>
 </head>
 <body>
 <div id="app"><div class="wrap">
  <div class="card"><div class="top">
   <div class="logo">CSV</div><div class="title"><h1>VCDS Log Analyzer</h1><div class="sub">VAG Toolbox · Messwertaufzeichnungen visualisieren und auswerten</div></div>
-  <div class="actions"><button onclick="location.href='toolbox.html'">← TOOLBOX</button><button onclick="logout()">ABMELDEN</button></div>
+  <div class="actions"><button onclick="location.href='toolbox.html'">← TOOLBOX</button></div>
  </div></div>
 
  <div class="card">
