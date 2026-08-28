@@ -2,12 +2,12 @@
   "name": "Werkstatt Tool",
   "short_name": "Werkstatt",
   "description": "Gemeinsame Fahrzeugakten, Bilder, VCDS-Logs und Dokumente für Werkstattteams",
-  "start_url": "/index.html?app=1",
+  "start_url": "/werkstatt-app-v2.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#020912",
   "theme_color": "#020912",
-  "orientation": "any",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/mechanix-deluxe-app.png",
@@ -15,5 +15,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "id": "/werkstatt-app-v2"
 }
