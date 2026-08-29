@@ -2,7 +2,7 @@
   "name": "Werkstatt Tool",
   "short_name": "Werkstatt",
   "description": "Gemeinsame Fahrzeugakten, Bilder, VCDS-Logs und Dokumente für Werkstattteams",
-  "start_url": "/werkstatt-app-v2.html",
+  "start_url": "/app-start.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#020912",
@@ -16,5 +16,5 @@
       "purpose": "any maskable"
     }
   ],
-  "id": "/werkstatt-app-v2"
+  "id": "/werkstatt-app"
 }
