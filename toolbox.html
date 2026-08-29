@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020912"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Werkstatt Tool"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="mechanix-deluxe-app.png" type="image/svg+xml">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020912">
 <title>VAG Toolbox – Übersicht</title>
 <style>
 *{box-sizing:border-box}
@@ -26,11 +26,10 @@ html.mobile .tool{padding:16px;border-radius:14px;display:grid;grid-template-col
 if(/android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent))document.documentElement.classList.add('mobile');
 document.documentElement.classList.add('ready');
 function logout(){localStorage.removeItem('mk100_token');sessionStorage.removeItem('mk100_token');location.href='index.html'}
-let installPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e});window.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('installApp');if(matchMedia('(display-mode: standalone)').matches||navigator.standalone){b.hidden=true;const card=document.getElementById('installCard');if(card)card.hidden=true;return}b.onclick=async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null}else if(/iphone|ipad|ipod/i.test(navigator.userAgent)){alert('In Safari: Teilen antippen und „Zum Home-Bildschirm“ auswählen.')}else alert('Im Browsermenü „App installieren“ oder „Zum Startbildschirm hinzufügen“ auswählen.')}});if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');</script>
+</script>
 </head>
 <body><div class="page"><main class="shell">
-<header class="header"><div class="lock">🔧</div><div class="headtext"><h1>Werkstatt Tool</h1><div class="by">Diagnose &amp; Codierung</div><div class="sub">Vorübergehend öffentlich zugänglich</div></div><div class="actions"><button class="btn" id="installApp">APP INSTALLIEREN</button></div></header><section class="installCard" id="installCard"><img class="installIcon" src="mechanix-deluxe-app.png" alt=""><div class="grow"><strong>Werkstatt Tool installieren</strong><div class="muted">Als App im Vollbildmodus auf dem Smartphone verwenden.</div></div><button class="open" onclick="document.getElementById('installApp').click()">JETZT INSTALLIEREN</button></section>
-<h2 class="title">Tools</h2><p class="intro">Wähle das gewünschte Werkzeug aus. Weitere VAG-Tools können hier später ergänzt werden.</p>
+<header class="header"><div class="lock">🔧</div><div class="headtext"><h1>VAG Toolbox</h1><div class="by">Diagnose &amp; Codierung</div><div class="sub">Vorübergehend öffentlich zugänglich</div></div></header><h2 class="title">Tools</h2><p class="intro">Wähle das gewünschte Werkzeug aus. Weitere VAG-Tools können hier später ergänzt werden.</p>
 <section class="grid">
  <article class="tool"><div class="toolicon">ABS</div><h2>MK100 ABS Codierungsrechner</h2><p>Berechnung der MK100 ABS-Codierung anhand von VIN, Fahrzeugdaten und den verfügbaren Konfigurationsoptionen.</p><div class="toolfooter"><span class="badge">AKTIV</span><button class="open" onclick="location.href='rechner.html'">TOOL ÖFFNEN</button></div></article>
  <article class="tool"><div class="toolicon">LOG</div><h2>VCDS Log Archiv</h2><p>VCDS Auto-Scans hochladen, Fahrzeugdaten automatisch erkennen und das Archiv nach VIN, Motorcode, Teilenummern und Codierungen durchsuchen.</p><div class="toolfooter"><span class="badge">ÖFFENTLICH</span><button class="open" onclick="location.href='vcds-log-archiv.html'">TOOL ÖFFNEN</button></div></article>
@@ -38,6 +37,5 @@ let installPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preve
  <article class="tool"><div class="toolicon">DPF</div><h2>DPF Zustandsübersicht</h2><p>VCDS-DPF-Messwerte automatisch erkennen, Rußbeladung farbig bewerten und einen übersichtlichen PDF-Bericht erstellen.</p><div class="toolfooter"><span class="badge">NEU</span><button class="open" onclick="location.href='dpf-zustand.html'">TOOL ÖFFNEN</button></div></article>
  <article class="tool"><div class="toolicon">RAD</div><h2>Reifen- & Felgenvergleich</h2><p>Serien- und Wunschbereifung vergleichen: Abrollumfang, Tachoabweichung, Bodenfreiheit, Einpresstiefe und Spurplatten.</p><div class="toolfooter"><span class="badge">NEU</span><button class="open" onclick="location.href='reifen-felgen-rechner.html'">TOOL ÖFFNEN</button></div></article>
  <article class="tool"><div class="toolicon">PR</div><h2>PR-Nummern Decoder</h2><p>PR-Code eingeben und die zugehörige Ausstattung direkt auf Deutsch anzeigen.</p><div class="toolfooter"><span class="badge">AKTIV</span><button class="open" onclick="location.href='pr-decoder.html'">TOOL ÖFFNEN</button></div></article>
- <article class="tool"><div class="toolicon">FOTO</div><h2>Private Foto-Gruppen</h2><p>Gruppen erstellen, Mitglieder per Einladungslink hinzufügen und Originalbilder bis 100 MB unverändert teilen.</p><div class="toolfooter"><span class="badge">NEU</span><button class="open" onclick="location.href='gruppen-fotos.html'">TOOL ÖFFNEN</button></div></article>
 </section><div class="footer">VAG Toolbox</div>
 </main></div></body></html>
